@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- was: <?xml version="1.0" encoding="UTF-8"?> -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"    
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd                       
+                        http://www.springframework.org/schema/aop
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                        http://www.springframework.org/schema/mvc
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/data/mongo
+                        http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+                        http://www.springframework.org/schema/data/repository
+                        http://www.springframework.org/schema/data/repository/spring-repository-1.5.xsd">
+    <!--
+    Most controllers will use the ControllerClassNameHandlerMapping above, but
+    for the index controller we are using ParameterizableViewController, so we must
+    define an explicit mapping for it.
+    -->
+    <!--    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="index.htm">indexController</prop>
+            </props>
+        </property>
+    </bean>-->
+   
+    <context:component-scan base-package="com.pravin" />
+    <mvc:resources location="/WEB-INF/WebContents/resources/" mapping="/resources/**"/>
+    <mvc:annotation-driven/>
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/WebContents/"
+          p:suffix=".jsp"/>
+
+    <!--    <bean name="indexController"
+    class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+    p:viewName="Home"/>-->
+    
+    
+    
+    <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+        <property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>  
+        <property name="url" value="jdbc:sqlserver://localhost:1433;databaseName=ForProject"></property>  
+        <property name="username" value="ProjectID"></property>  
+        <property name="password" value="5678"></property>  
+    </bean>  
+    <bean id="jdbc" class="org.springframework.jdbc.core.JdbcTemplate">  
+        <property name="dataSource" ref="ds"></property>  
+    </bean>  
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="15728640"/>
+    </bean>
+  
+    <!-- ....................................\\\\\\\\\\\\Mongo db connectivity////////////////////|||||||||||||| -->    
+    <mongo:mongo id ="mongo" host="localhost" port="27017"/>
+
+    <mongo:mongo>
+        <mongo:options connections-per-host="100"
+                       threads-allowed-to-block-for-connection-multiplier="5"
+                       max-wait-time="120000000"
+                       connect-timeout="10000000"
+                       socket-keep-alive="true"
+                       socket-timeout="15000000"
+                       auto-connect-retry="true"/>
+    </mongo:mongo>
+    
+    <!--    <mongo:db-factory id="mongoDbFactory" dbname="ForProject" mongo-ref="mongo" />-->
+    
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo"/>
+        <constructor-arg name="databaseName" value="ForProject"/>
+    </bean>
+    
+    
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
+        <property name="host" value="smtp.gmail.com" />  
+        <property name="username" value="pravinkumar2629@gmail.com" />  
+        <property name="password" value="97896767" />  
+        <property name="javaMailProperties">  
+            <props>  
+                <prop key="mail.smtp.auth">true</prop>  
+                <prop key="mail.smtp.socketFactory.port">465</prop>  
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>  
+                <prop key="mail.smtp.port">465</prop>  
+            </props>  
+        </property>  
+    </bean>  
+    
+</beans>
+
